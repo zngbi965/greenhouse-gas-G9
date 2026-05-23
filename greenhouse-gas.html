@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ก๊าซเรือนกระจกโลก</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030a0e;
+    --surface: #071520;
+    --surface2: #0d2035;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #7fff6e;
+    --text: #d0eaf5;
+    --text-muted: #5a8099;
+    --danger: #ff3b5c;
+    --warn: #ffb700;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sarabun', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(0,229,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(255,107,53,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 50% 50%, rgba(127,255,110,0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grid overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { position: relative; z-index: 1; }
+
+  /* HERO */
+  header {
+    padding: 60px 40px 40px;
+    border-bottom: 1px solid rgba(0,229,255,0.1);
+    position: relative;
+  }
+
+  .header-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 700;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #ffffff 0%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .header-sub {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,59,92,0.15);
+    border: 1px solid rgba(255,59,92,0.3);
+    color: var(--danger);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-top: 20px;
+    letter-spacing: 1px;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--danger);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  /* STATS ROW */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: rgba(0,229,255,0.08);
+    border-top: 1px solid rgba(0,229,255,0.08);
+    border-bottom: 1px solid rgba(0,229,255,0.08);
+    margin: 0;
+  }
+
+  .stat-card {
+    background: var(--bg);
+    padding: 32px 28px;
+    transition: background 0.3s;
+    cursor: default;
+  }
+
+  .stat-card:hover { background: var(--surface); }
+
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .stat-value.red { color: var(--danger); }
+  .stat-value.orange { color: var(--accent2); }
+  .stat-value.cyan { color: var(--accent); }
+  .stat-value.green { color: var(--accent3); }
+
+  .stat-change {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .stat-change.up { color: var(--danger); }
+  .stat-change.dn { color: var(--accent3); }
+
+  /* MAIN CONTENT */
+  .main { padding: 48px 40px; }
+
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,229,255,0.3), transparent);
+  }
+
+  /* CHART */
+  .chart-section {
+    background: var(--surface);
+    border: 1px solid rgba(0,229,255,0.1);
+    border-radius: 4px;
+    padding: 32px;
+    margin-bottom: 40px;
+  }
+
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .chart-title { font-size: 18px; font-weight: 600; }
+  .chart-desc { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .chart-wrap {
+    position: relative;
+    height: 280px;
+    margin-bottom: 16px;
+  }
+
+  canvas { width: 100% !important; }
+
+  /* BAR CHART custom */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 220px;
+    padding-top: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bar-chart::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1px;
+    background: rgba(0,229,255,0.2);
+  }
+
+  /* Gridlines */
+  .bar-chart-grid {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+    padding-bottom: 0;
+  }
+
+  .grid-line {
+    border-top: 1px dashed rgba(0,229,255,0.07);
+    width: 100%;
+  }
+
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+  }
+
+  .bar {
+    width: 100%;
+    border-radius: 2px 2px 0 0;
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: pointer;
+    position: relative;
+    max-width: 40px;
+  }
+
+  .bar:hover { filter: brightness(1.3); }
+
+  .bar-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    text-align: center;
+    white-space: nowrap;
+    margin-top: 6px;
+  }
+
+  .bar-val {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .bar:hover .bar-val { opacity: 1; }
+
+  /* GAS TYPES TABLE */
+  .gas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .gas-card {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .gas-card:hover {
+    border-color: rgba(0,229,255,0.25);
+    transform: translateY(-2px);
+  }
+
+  .gas-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .gas-card.co2::before { background: linear-gradient(90deg, var(--danger), var(--accent2)); }
+  .gas-card.ch4::before { background: linear-gradient(90deg, var(--warn), #ff9500); }
+  .gas-card.n2o::before { background: linear-gradient(90deg, #a855f7, #7c3aed); }
+  .gas-card.fgas::before { background: linear-gradient(90deg, var(--accent), #0090ff); }
+
+  .gas-formula {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .co2 .gas-formula { color: var(--danger); }
+  .ch4 .gas-formula { color: var(--warn); }
+  .n2o .gas-formula { color: #a855f7; }
+  .fgas .gas-formula { color: var(--accent); }
+
+  .gas-name { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; }
+
+  .gas-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 13px;
+  }
+
+  .gas-row:last-child { border-bottom: none; }
+  .gas-row-label { color: var(--text-muted); }
+  .gas-row-val { font-family: 'Space Mono', monospace; font-weight: 600; }
+
+  /* PROGRESS BAR */
+  .progress-wrap { margin: 8px 0 4px; }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .progress-track {
+    height: 4px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1.5s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  /* EFFECTS TABLE */
+  .effects-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  .effects-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(0,229,255,0.15);
+    background: var(--surface);
+  }
+
+  .effects-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: top;
+  }
+
+  .effects-table tr:hover td { background: rgba(0,229,255,0.03); }
+
+  .severity {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .sev-critical { background: rgba(255,59,92,0.15); color: var(--danger); border: 1px solid rgba(255,59,92,0.3); }
+  .sev-high { background: rgba(255,183,0,0.12); color: var(--warn); border: 1px solid rgba(255,183,0,0.3); }
+  .sev-medium { background: rgba(168,85,247,0.12); color: #a855f7; border: 1px solid rgba(168,85,247,0.3); }
+
+  /* SOLUTIONS */
+  .solutions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .sol-card {
+    background: var(--surface);
+    border: 1px solid rgba(127,255,110,0.1);
+    border-radius: 4px;
+    padding: 24px;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .sol-card:hover {
+    border-color: rgba(127,255,110,0.3);
+    background: rgba(127,255,110,0.03);
+  }
+
+  .sol-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .sol-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent3);
+    margin-bottom: 8px;
+  }
+
+  .sol-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(0,229,255,0.1);
+    padding: 24px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-note {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .footer-src {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    opacity: 0.6;
+  }
+
+  @media (max-width: 600px) {
+    header, .main, footer { padding-left: 20px; padding-right: 20px; }
+    .bar-label { font-size: 7px; }
+  }
+
+  /* Fade in */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.7s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in:nth-child(1) { animation-delay: 0.1s; }
+  .fade-in:nth-child(2) { animation-delay: 0.2s; }
+  .fade-in:nth-child(3) { animation-delay: 0.3s; }
+  .fade-in:nth-child(4) { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-tag">// ระบบติดตามสภาพภูมิอากาศโลก v2.0</div>
+    <h1>ก๊าซเรือนกระจก<br>บนโลกของเรา</h1>
+    <p class="header-sub">ข้อมูลการปล่อยก๊าซเรือนกระจกทั่วโลกตั้งแต่ปี 1990–2023 รวมถึงสาเหตุ ผลกระทบ และแนวทางแก้ไข</p>
+    <div class="live-badge"><span class="live-dot"></span> อัปเดตข้อมูลล่าสุด 2023</div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card fade-in">
+      <div class="stat-label">CO₂ ในบรรยากาศ</div>
+      <div class="stat-value red">422 <small style="font-size:16px">ppm</small></div>
+      <div class="stat-change up">▲ +3.0 ppm จากปีก่อน</div>
+    </div>
+    <div class="stat-card fade-in">
+      <div class="stat-label">การปล่อยรวม (2023)</div>
+      <div class="stat-value orange">57.4 <small style="font-size:16px">GtCO₂e</small></div>
+      <div class="stat-change up">▲ +1.2% YoY</div>
+    </div>
+    <div class="stat-card fade-in">
+      <div class="stat-label">อุณหภูมิเพิ่มขึ้น</div>
+      <div class="stat-value warn">+1.45 <small style="font-size:16px">°C</small></div>
+      <div class="stat-change up">▲ จากยุคก่อนอุตสาหกรรม</div>
+    </div>
+    <div class="stat-card fade-in">
+      <div class="stat-label">ระดับน้ำทะเลเพิ่ม</div>
+      <div class="stat-value cyan">+101 <small style="font-size:16px">mm</small></div>
+      <div class="stat-change up">▲ จากปี 1993</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- EMISSION CHART -->
+    <div class="section-title">การปล่อยก๊าซตามปี</div>
+    <div class="chart-section">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">ปริมาณการปล่อยก๊าซเรือนกระจกรวมทั่วโลก</div>
+          <div class="chart-desc">หน่วย: พันล้านตัน CO₂ เทียบเท่า (GtCO₂e) · ปี 1990–2023</div>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div>CO₂</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--warn)"></div>CH₄</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#a855f7"></div>N₂O+อื่นๆ</div>
+        </div>
+      </div>
+      <div id="barChart" class="bar-chart">
+        <div class="bar-chart-grid" id="gridLines"></div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:8px;margin-top:12px;font-family:'Space Mono',monospace;font-size:10px;color:var(--text-muted)">
+        กดที่แถบเพื่อดูข้อมูลเพิ่มเติม
+      </div>
+    </div>
+
+    <!-- GAS TYPES -->
+    <div class="section-title">ประเภทก๊าซเรือนกระจก</div>
+    <div class="gas-grid">
+      <div class="gas-card co2">
+        <div class="gas-formula">CO₂</div>
+        <div class="gas-name">คาร์บอนไดออกไซด์</div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>สัดส่วนในบรรยากาศ</span><span style="color:var(--danger)">76%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:0%;background:linear-gradient(90deg,var(--danger),var(--accent2))" data-w="76"></div></div>
+        </div>
+        <div class="gas-row"><span class="gas-row-label">GWP (100 ปี)</span><span class="gas-row-val" style="color:var(--danger)">1</span></div>
+        <div class="gas-row"><span class="gas-row-label">อายุในบรรยากาศ</span><span class="gas-row-val">300–1,000 ปี</span></div>
+        <div class="gas-row"><span class="gas-row-label">แหล่งหลัก</span><span class="gas-row-val">เชื้อเพลิงฟอสซิล</span></div>
+        <div class="gas-row"><span class="gas-row-label">ความเข้มข้น (2023)</span><span class="gas-row-val" style="color:var(--danger)">422 ppm</span></div>
+      </div>
+
+      <div class="gas-card ch4">
+        <div class="gas-formula">CH₄</div>
+        <div class="gas-name">มีเทน</div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>สัดส่วนในบรรยากาศ</span><span style="color:var(--warn)">16%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:0%;background:linear-gradient(90deg,var(--warn),#ff9500)" data-w="16"></div></div>
+        </div>
+        <div class="gas-row"><span class="gas-row-label">GWP (100 ปี)</span><span class="gas-row-val" style="color:var(--warn)">28–36</span></div>
+        <div class="gas-row"><span class="gas-row-label">อายุในบรรยากาศ</span><span class="gas-row-val">~12 ปี</span></div>
+        <div class="gas-row"><span class="gas-row-label">แหล่งหลัก</span><span class="gas-row-val">ปศุสัตว์ / ขยะ</span></div>
+        <div class="gas-row"><span class="gas-row-label">ความเข้มข้น (2023)</span><span class="gas-row-val" style="color:var(--warn)">1,932 ppb</span></div>
+      </div>
+
+      <div class="gas-card n2o">
+        <div class="gas-formula">N₂O</div>
+        <div class="gas-name">ไนตรัสออกไซด์</div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>สัดส่วนในบรรยากาศ</span><span style="color:#a855f7">6%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:0%;background:linear-gradient(90deg,#a855f7,#7c3aed)" data-w="6"></div></div>
+        </div>
+        <div class="gas-row"><span class="gas-row-label">GWP (100 ปี)</span><span class="gas-row-val" style="color:#a855f7">265–298</span></div>
+        <div class="gas-row"><span class="gas-row-label">อายุในบรรยากาศ</span><span class="gas-row-val">~114 ปี</span></div>
+        <div class="gas-row"><span class="gas-row-label">แหล่งหลัก</span><span class="gas-row-val">การเกษตร / ปุ๋ย</span></div>
+        <div class="gas-row"><span class="gas-row-label">ความเข้มข้น (2023)</span><span class="gas-row-val" style="color:#a855f7">336 ppb</span></div>
+      </div>
+
+      <div class="gas-card fgas">
+        <div class="gas-formula">F-Gas</div>
+        <div class="gas-name">ก๊าซฟลูออรีน</div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>สัดส่วนในบรรยากาศ</span><span style="color:var(--accent)">2%</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:0%;background:linear-gradient(90deg,var(--accent),#0090ff)" data-w="2"></div></div>
+        </div>
+        <div class="gas-row"><span class="gas-row-label">GWP (100 ปี)</span><span class="gas-row-val" style="color:var(--accent)">100–22,800</span></div>
+        <div class="gas-row"><span class="gas-row-label">อายุในบรรยากาศ</span><span class="gas-row-val">สูงมาก</span></div>
+        <div class="gas-row"><span class="gas-row-label">แหล่งหลัก</span><span class="gas-row-val">เครื่องทำความเย็น</span></div>
+        <div class="gas-row"><span class="gas-row-label">ประเภทหลัก</span><span class="gas-row-val" style="color:var(--accent)">HFCs, PFCs, SF₆</span></div>
+      </div>
+    </div>
+
+    <!-- EFFECTS TABLE -->
+    <div class="section-title">ผลกระทบจากก๊าซเรือนกระจก</div>
+    <div style="overflow-x:auto;margin-bottom:40px">
+      <table class="effects-table">
+        <thead>
+          <tr>
+            <th>ผลกระทบ</th>
+            <th>คำอธิบาย</th>
+            <th>สถานะ</th>
+            <th>ระดับ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>อุณหภูมิโลกสูงขึ้น</strong></td>
+            <td style="color:var(--text-muted)">อุณหภูมิเฉลี่ยโลกเพิ่มขึ้น +1.45°C จากยุคก่อนอุตสาหกรรม ส่งผลให้คลื่นความร้อนรุนแรงขึ้น</td>
+            <td><span style="color:var(--danger);font-family:'Space Mono',monospace;font-size:12px">เกิดขึ้นแล้ว</span></td>
+            <td><span class="severity sev-critical">วิกฤต</span></td>
+          </tr>
+          <tr>
+            <td><strong>ระดับน้ำทะเลสูงขึ้น</strong></td>
+            <td style="color:var(--text-muted)">น้ำแข็งขั้วโลกละลาย ส่งผลให้ระดับน้ำทะเลเพิ่มขึ้น คุกคามพื้นที่ชายฝั่งและเกาะต่างๆ</td>
+            <td><span style="color:var(--danger);font-family:'Space Mono',monospace;font-size:12px">เกิดขึ้นแล้ว</span></td>
+            <td><span class="severity sev-critical">วิกฤต</span></td>
+          </tr>
+          <tr>
+            <td><strong>สภาพอากาศสุดขีด</strong></td>
+            <td style="color:var(--text-muted)">พายุ น้ำท่วม ภัยแล้ง และไฟป่ารุนแรงและบ่อยครั้งมากขึ้น ส่งผลต่อเศรษฐกิจและสังคม</td>
+            <td><span style="color:var(--warn);font-family:'Space Mono',monospace;font-size:12px">กำลังเพิ่มขึ้น</span></td>
+            <td><span class="severity sev-high">สูง</span></td>
+          </tr>
+          <tr>
+            <td><strong>ความเป็นกรดของมหาสมุทร</strong></td>
+            <td style="color:var(--text-muted)">CO₂ ละลายในน้ำทะเลทำให้ค่า pH ลดลง กระทบต่อปะการังและสิ่งมีชีวิตในทะเล</td>
+            <td><span style="color:var(--warn);font-family:'Space Mono',monospace;font-size:12px">กำลังเพิ่มขึ้น</span></td>
+            <td><span class="severity sev-high">สูง</span></td>
+          </tr>
+          <tr>
+            <td><strong>ความหลากหลายทางชีวภาพ</strong></td>
+            <td style="color:var(--text-muted)">สัตว์และพืชหลายชนิดไม่สามารถปรับตัวได้ทัน ทำให้เสี่ยงต่อการสูญพันธุ์</td>
+            <td><span style="color:#a855f7;font-family:'Space Mono',monospace;font-size:12px">กำลังเร่งตัว</span></td>
+            <td><span class="severity sev-medium">ปานกลาง</span></td>
+          </tr>
+          <tr>
+            <td><strong>ความมั่นคงทางอาหาร</strong></td>
+            <td style="color:var(--text-muted)">สภาพอากาศแปรปรวนกระทบต่อผลผลิตทางการเกษตร เสี่ยงต่อการขาดแคลนอาหารในอนาคต</td>
+            <td><span style="color:#a855f7;font-family:'Space Mono',monospace;font-size:12px">กำลังเร่งตัว</span></td>
+            <td><span class="severity sev-medium">ปานกลาง</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TOP EMITTERS -->
+    <div class="section-title">ประเทศผู้ปล่อยก๊าซรายใหญ่ (2022)</div>
+    <div class="chart-section" style="margin-bottom:40px">
+      <div id="countryChart"></div>
+    </div>
+
+    <!-- SOLUTIONS -->
+    <div class="section-title">แนวทางแก้ไข</div>
+    <div class="solutions-grid">
+      <div class="sol-card">
+        <span class="sol-icon">☀️</span>
+        <div class="sol-title">พลังงานหมุนเวียน</div>
+        <div class="sol-desc">เปลี่ยนจากเชื้อเพลิงฟอสซิลเป็นพลังงานแสงอาทิตย์ ลม และน้ำ ลด CO₂ ได้ถึง 70–80%</div>
+      </div>
+      <div class="sol-card">
+        <span class="sol-icon">🌳</span>
+        <div class="sol-title">ปลูกป่าและอนุรักษ์</div>
+        <div class="sol-desc">ป่าทำหน้าที่ดูดซับ CO₂ การปลูกป่าเพิ่มและหยุดการทำลายป่าช่วยลดก๊าซได้อย่างมีนัยสำคัญ</div>
+      </div>
+      <div class="sol-card">
+        <span class="sol-icon">⚡</span>
+        <div class="sol-title">ยานพาหนะไฟฟ้า</div>
+        <div class="sol-desc">การขนส่งปล่อย CO₂ ถึง 16% ของโลก การเปลี่ยนเป็น EV ช่วยลดการปล่อยก๊าซได้โดยตรง</div>
+      </div>
+      <div class="sol-card">
+        <span class="sol-icon">🏭</span>
+        <div class="sol-title">CCS Technology</div>
+        <div class="sol-desc">เทคโนโลยีดักจับและกักเก็บคาร์บอน (Carbon Capture & Storage) ดูดซับ CO₂ จากแหล่งอุตสาหกรรม</div>
+      </div>
+      <div class="sol-card">
+        <span class="sol-icon">🥗</span>
+        <div class="sol-title">เปลี่ยนรูปแบบอาหาร</div>
+        <div class="sol-desc">ลดการบริโภคเนื้อแดง เพิ่มโปรตีนจากพืช ลด CH₄ จากปศุสัตว์และลดการใช้พื้นที่เกษตร</div>
+      </div>
+      <div class="sol-card">
+        <span class="sol-icon">🏙️</span>
+        <div class="sol-title">เมืองอัจฉริยะ</div>
+        <div class="sol-desc">ออกแบบเมืองให้ประหยัดพลังงาน ระบบขนส่งสาธารณะที่มีประสิทธิภาพ อาคารเขียวและประหยัดพลังงาน</div>
+      </div>
+    </div>
+
+    <!-- THAILAND SECTION -->
+    <div class="section-title">ประเทศไทยและก๊าซเรือนกระจก</div>
+    <div class="chart-section">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">การปล่อยก๊าซเรือนกระจกของไทย</div>
+          <div class="chart-desc">ปริมาณรวม ~370 MtCO₂e ต่อปี · อันดับที่ 22 ของโลก</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <div style="background:var(--surface2);padding:20px;border-radius:4px;border:1px solid rgba(255,183,0,0.15)">
+          <div style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;letter-spacing:2px;margin-bottom:8px">พลังงาน</div>
+          <div style="font-size:24px;font-weight:700;color:var(--warn);font-family:'Space Mono',monospace">70%</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">ไฟฟ้าและความร้อน การขนส่ง</div>
+          <div class="progress-track" style="margin-top:10px"><div class="progress-fill" style="width:0%;background:var(--warn)" data-w="70"></div></div>
+        </div>
+        <div style="background:var(--surface2);padding:20px;border-radius:4px;border:1px solid rgba(168,85,247,0.15)">
+          <div style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;letter-spacing:2px;margin-bottom:8px">การเกษตร</div>
+          <div style="font-size:24px;font-weight:700;color:#a855f7;font-family:'Space Mono',monospace">14%</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">นาข้าว ปศุสัตว์ ปุ๋ย</div>
+          <div class="progress-track" style="margin-top:10px"><div class="progress-fill" style="width:0%;background:#a855f7" data-w="14"></div></div>
+        </div>
+        <div style="background:var(--surface2);padding:20px;border-radius:4px;border:1px solid rgba(0,229,255,0.15)">
+          <div style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;letter-spacing:2px;margin-bottom:8px">อุตสาหกรรม</div>
+          <div style="font-size:24px;font-weight:700;color:var(--accent);font-family:'Space Mono',monospace">11%</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">ซีเมนต์ เหล็ก เคมีภัณฑ์</div>
+          <div class="progress-track" style="margin-top:10px"><div class="progress-fill" style="width:0%;background:var(--accent)" data-w="11"></div></div>
+        </div>
+        <div style="background:var(--surface2);padding:20px;border-radius:4px;border:1px solid rgba(127,255,110,0.15)">
+          <div style="font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;letter-spacing:2px;margin-bottom:8px">อื่นๆ</div>
+          <div style="font-size:24px;font-weight:700;color:var(--accent3);font-family:'Space Mono',monospace">5%</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px">ขยะ ป่าไม้ อาคาร</div>
+          <div class="progress-track" style="margin-top:10px"><div class="progress-fill" style="width:0%;background:var(--accent3)" data-w="5"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:20px;padding:16px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.1);border-radius:4px;font-size:13px;color:var(--text-muted)">
+        🎯 <strong style="color:var(--accent3)">เป้าหมายของไทย:</strong> ลดก๊าซเรือนกระจก <strong style="color:var(--text)">40%</strong> ภายในปี 2030 และบรรลุความเป็นกลางทางคาร์บอนภายในปี <strong style="color:var(--text)">2050</strong>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-note">ข้อมูลอ้างอิงจาก IPCC, IEA, NOAA, Global Carbon Project, Our World in Data</div>
+    <div class="footer-src">// DATA SRC: GHG TRACKER 2023</div>
+  </footer>
+
+</div>
+
+<script>
+// ===== DATA =====
+const yearlyData = [
+  { year: '1990', total: 38.2, co2: 29.0, ch4: 6.2, other: 3.0 },
+  { year: '1995', total: 39.8, co2: 30.2, ch4: 6.3, other: 3.3 },
+  { year: '2000', total: 41.5, co2: 31.5, ch4: 6.5, other: 3.5 },
+  { year: '2005', total: 45.0, co2: 34.8, ch4: 6.8, other: 3.4 },
+  { year: '2008', total: 47.9, co2: 37.2, ch4: 7.0, other: 3.7 },
+  { year: '2010', total: 49.5, co2: 38.5, ch4: 7.2, other: 3.8 },
+  { year: '2012', total: 52.0, co2: 40.5, ch4: 7.5, other: 4.0 },
+  { year: '2015', total: 52.2, co2: 40.0, ch4: 7.8, other: 4.4 },
+  { year: '2018', total: 55.3, co2: 43.0, ch4: 8.0, other: 4.3 },
+  { year: '2019', total: 55.0, co2: 42.8, ch4: 7.9, other: 4.3 },
+  { year: '2020', total: 51.5, co2: 39.5, ch4: 7.8, other: 4.2 },
+  { year: '2021', total: 54.5, co2: 42.2, ch4: 8.0, other: 4.3 },
+  { year: '2022', total: 56.8, co2: 44.0, ch4: 8.3, other: 4.5 },
+  { year: '2023', total: 57.4, co2: 44.5, ch4: 8.4, other: 4.5 },
+];
+
+// ===== BAR CHART =====
+const chartEl = document.getElementById('barChart');
+const max = Math.max(...yearlyData.map(d => d.total));
+
+// grid lines
+const gridEl = document.getElementById('gridLines');
+for (let i = 0; i < 4; i++) gridEl.innerHTML += `<div class="grid-line"></div>`;
+
+yearlyData.forEach(d => {
+  const pct = (d.total / max) * 200;
+  const co2h = (d.co2 / max) * 200;
+  const ch4h = (d.ch4 / max) * 200;
+  const oth = (d.other / max) * 200;
+
+  const group = document.createElement('div');
+  group.className = 'bar-group';
+  group.innerHTML = `
+    <div class="bar" style="height:0px;background:linear-gradient(180deg,var(--danger) 0%,var(--accent2) 100%);margin-bottom:0" 
+         data-h="${co2h}" title="CO₂: ${d.co2} Gt">
+      <span class="bar-val">${d.total}</span>
+    </div>
+    <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text-muted);margin-top:6px;text-align:center">${d.year}</div>
+  `;
+
+  // Stack CH4 and others
+  const bar = group.querySelector('.bar');
+  chartEl.appendChild(group);
+
+  setTimeout(() => {
+    bar.style.height = co2h + 'px';
+    bar.style.boxShadow = `0 0 12px rgba(255,59,92,0.3)`;
+  }, 200 + yearlyData.indexOf(d) * 60);
+});
+
+// Tooltip
+chartEl.querySelectorAll('.bar').forEach((bar, i) => {
+  bar.addEventListener('mouseenter', () => {
+    bar.querySelector('.bar-val').style.opacity = '1';
+  });
+  bar.addEventListener('mouseleave', () => {
+    bar.querySelector('.bar-val').style.opacity = '0';
+  });
+});
+
+// ===== COUNTRY CHART =====
+const countries = [
+  { name: 'จีน', val: 14.7, color: 'var(--danger)' },
+  { name: 'สหรัฐอเมริกา', val: 6.0, color: 'var(--accent2)' },
+  { name: 'อินเดีย', val: 3.4, color: 'var(--warn)' },
+  { name: 'รัสเซีย', val: 2.4, color: '#a855f7' },
+  { name: 'ญี่ปุ่น', val: 1.1, color: 'var(--accent)' },
+  { name: 'บราซิล', val: 1.0, color: 'var(--accent3)' },
+  { name: 'เยอรมนี', val: 0.7, color: '#0090ff' },
+  { name: 'ไทย', val: 0.37, color: '#ff6b9d' },
+];
+
+const maxC = Math.max(...countries.map(c => c.val));
+const cc = document.getElementById('countryChart');
+cc.innerHTML = countries.map(c => `
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+    <div style="width:90px;font-size:13px;flex-shrink:0;text-align:right;color:var(--text-muted)">${c.name}</div>
+    <div style="flex:1;height:28px;background:rgba(255,255,255,0.04);border-radius:2px;overflow:hidden;position:relative">
+      <div style="height:100%;width:0%;background:${c.color};border-radius:2px;transition:width 1.2s cubic-bezier(0.23,1,0.32,1);opacity:0.85" 
+           data-w="${(c.val/maxC)*100}" class="progress-fill"></div>
+      <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:'Space Mono',monospace;font-size:11px;color:var(--text)">${c.val} Gt</span>
+    </div>
+  </div>
+`).join('');
+
+// ===== ANIMATE PROGRESS BARS =====
+function animateBars() {
+  document.querySelectorAll('.progress-fill[data-w]').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 100) {
+      el.style.width = el.dataset.w + '%';
+    }
+  });
+}
+
+window.addEventListener('scroll', animateBars);
+setTimeout(animateBars, 500);
+</script>
+</body>
+</html>
