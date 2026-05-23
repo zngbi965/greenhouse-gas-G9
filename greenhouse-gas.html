@@ -530,10 +530,86 @@
   .fade-in:nth-child(2) { animation-delay: 0.2s; }
   .fade-in:nth-child(3) { animation-delay: 0.3s; }
   .fade-in:nth-child(4) { animation-delay: 0.4s; }
+
+  /* IMAGES */
+  .hero-img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.55) saturate(0.8);
+    border-bottom: 1px solid rgba(0,229,255,0.1);
+  }
+
+  .hero-img-wrap {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(3,10,14,0.2) 0%, rgba(3,10,14,0.85) 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 32px 40px;
+  }
+
+  .hero-img-caption {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .photo-card {
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(0,229,255,0.08);
+    aspect-ratio: 16/9;
+  }
+
+  .photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.6) saturate(0.85);
+    transition: filter 0.4s, transform 0.4s;
+  }
+
+  .photo-card:hover img {
+    filter: brightness(0.8) saturate(1);
+    transform: scale(1.03);
+  }
+
+  .photo-caption {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 10px 14px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.75));
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
+
+  <!-- HERO IMAGE -->
+  <div class="hero-img-wrap">
+    <img class="hero-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Steelworksinpittsburgh.jpg/1280px-Steelworksinpittsburgh.jpg" alt="โรงงานและควันพิษ" onerror="this.src='https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=1280&q=80'">
+    <div class="hero-img-overlay">
+      <span class="hero-img-caption">// ควันจากโรงงานอุตสาหกรรม — แหล่งปล่อยก๊าซเรือนกระจกหลักของโลก</span>
+    </div>
+  </div>
 
   <!-- HEADER -->
   <header>
@@ -650,6 +726,22 @@
 
     <!-- EFFECTS TABLE -->
     <div class="section-title">ผลกระทบจากก๊าซเรือนกระจก</div>
+
+    <!-- PHOTO GRID -->
+    <div class="photo-grid">
+      <div class="photo-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Retreating_glacier.jpg/1280px-Retreating_glacier.jpg" alt="ธารน้ำแข็งละลาย" onerror="this.src='https://images.unsplash.com/photo-1518623489648-a173ef7824f3?w=800&q=80'">
+        <div class="photo-caption">🧊 ธารน้ำแข็งละลายจากอุณหภูมิที่สูงขึ้น</div>
+      </div>
+      <div class="photo-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Above_Gotham.jpg/1280px-Above_Gotham.jpg" alt="เมืองและมลพิษ" onerror="this.src='https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80'">
+        <div class="photo-caption">🏙️ เมืองใหญ่ — แหล่งปล่อย CO₂ หนาแน่น</div>
+      </div>
+      <div class="photo-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Coral_reef_at_palmyra.jpg/1280px-Coral_reef_at_palmyra.jpg" alt="ปะการัง" onerror="this.src='https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=800&q=80'">
+        <div class="photo-caption">🪸 ปะการังได้รับผลกระทบจากความเป็นกรดของมหาสมุทร</div>
+      </div>
+    </div>
     <div style="overflow-x:auto;margin-bottom:40px">
       <table class="effects-table">
         <thead>
@@ -709,6 +801,16 @@
 
     <!-- SOLUTIONS -->
     <div class="section-title">แนวทางแก้ไข</div>
+    <div class="photo-grid" style="margin-bottom:24px">
+      <div class="photo-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Photovoltaik_Dachanlage_Hannover_-_Schwarze_Heide_-_1_MW.jpg/1280px-Photovoltaik_Dachanlage_Hannover_-_Schwarze_Heide_-_1_MW.jpg" alt="พลังงานแสงอาทิตย์" onerror="this.src='https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&q=80'">
+        <div class="photo-caption">☀️ แผงโซลาร์เซลล์ — พลังงานสะอาดทางเลือก</div>
+      </div>
+      <div class="photo-card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/FocusedOn_a_TreePlanting_in_Kenya_%2815190495102%29.jpg/1280px-FocusedOn_a_TreePlanting_in_Kenya_%2815190495102%29.jpg" alt="ปลูกต้นไม้" onerror="this.src='https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80'">
+        <div class="photo-caption">🌳 การปลูกป่า — ดูดซับ CO₂ จากบรรยากาศ</div>
+      </div>
+    </div>
     <div class="solutions-grid">
       <div class="sol-card">
         <span class="sol-icon">☀️</span>
